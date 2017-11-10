@@ -1,0 +1,11 @@
+{
+  "require": {
+    "php": "^7.0.0",
+    "guzzlehttp/guzzle": "^6.2"
+  },
+  "scripts": {
+    "compile": [
+      "mkdir data && chmod -R 777 data/"
+    ]
+  }
+}
