@@ -310,6 +310,10 @@ function verifyOtp(&$details, $otp = false)
 
 		updateDetails($details);
 
+		if ($response_arr['status'] !== 'Success') {
+			return "END Something went wrong while veryfying your airtime purchase. Please try again.";
+		}
+
 		return fulfil($_POST['phoneNumber'], $ongoing);
 
 	} catch (GuzzleException $e) {
