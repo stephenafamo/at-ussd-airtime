@@ -40,7 +40,7 @@ function handle()
 {
 	$details = getDetails($_POST['phoneNumber']);
 
-	if (empty($_POST['text'])) {
+	if (empty($_POST['text']) && empty($details['ongoing'])) {
 		return base();
 	}
 
@@ -139,21 +139,20 @@ function validate(Array &$input, Array $details)
 		$input[]		= $otp;
 	}
 
-	if (isset($input[0]) && (int) $input[0] > 50 && (int) $input[0] < 10000) {
+	if (isset($input[0]) && (int) $input[0] > 100 && (int) $input[0] < 10000) {
 		$amount 	= (int) $input[0];
 	} 
 
 
-	if ((int) $input[0] > 100000 && (int) $input[0] < 999999) {
+	if ((int) $input[0] > 10000 && (int) $input[0] < 99999) {
 		$order_number 	= $input[0];
 		$file 			= "../data/orders/".$order_number;
 
 		if (file_exists($file)) {
 			$order 		= json_decode(file_get_contents($file));
+			$type 			= "checkout";
+			$amount 		= $order->total;
 		}
-
-		$type 			= "checkout";
-		$amount 		= $order->total;
 	}
 
 	if (!$amount) {
@@ -264,8 +263,6 @@ function charge($amount, $account_key, &$details)
 		if ($response_arr['status'] !== 'PendingValidation' || !array_key_exists('transactionId', $response_arr)) {
 			return ['status' => 'error'];
 		}
-
-		mockOTP($_POST['phoneNumber'], $amount);
 		
 		$details['ongoing'] = [
 			'time' 				=> time(),
@@ -342,7 +339,6 @@ function fulfil($phoneNumber, $ongoing)
 
 function pay($phoneNumber, $amount, $file)
 {
-		// var_dump($file); die;
 	if (!file_exists($file)) {
 		return "END we experienced an error retrieving that order. Please contact us";
 	}
@@ -382,32 +378,4 @@ function sendAirtime($phoneNumber, $amount)
 
 		return "CON Your airtime purchase was successful!";
 	} catch (GuzzleException $e) {}
-}
-
-function mockOTP($phoneNumber, $amount)
-{
-	global $sandbox_client;
-
-	$data = [
-		'username' 	=> $_ENV['SANDBOX_API_USERNAME'],
-		'to' 		=> $_ENV['MESSAGING_SHORTCODE'],
-		'from'		=> '12345',
-		'message' 	=> 'Your OTP is '.mt_rand(100000, 999999)." Use it to complete your purchase of NGN $amount airtime"
-	];
-
-	try {
-		$response 			= $sandbox_client->post("messaging", ['form_params' => $data]);
-		$response_arr		= json_decode($response->getBody()->getContents(), true);
-		
-	} catch (GuzzleException $e) {}
-}
-
-function randomString($length) {
-    $keys = array_merge(range(0,9), range('a', 'z'));
-
-    $key = "";
-    for($i=0; $i < $length; $i++) {
-        $key .= $keys[mt_rand(0, count($keys) - 1)];
-    }
-    return $key;
 }

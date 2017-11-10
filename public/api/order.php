@@ -26,7 +26,7 @@ function handle() {
 
 	$order_json 	= json_encode($order);
 
-	$order_number 	= mt_rand(100000, 999999);
+	$order_number 	= mt_rand(10000, 99999);
 
 	while(file_exists("../../data/orders/".$order_number)) {
 		$order_number 	= mt_rand(1000, 9999);
