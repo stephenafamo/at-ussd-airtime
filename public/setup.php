@@ -9,13 +9,13 @@ $file 	= null;
 
 $banks = [
 	1	=> ['name' => "First Bank", 	"code" => 234001],
-	2	=> ['name' => "Zenith Bank", 	"code" => 234002],
+	// 2	=> ['name' => "Zenith Bank", 	"code" => 234002],
+	2	=> ['name' => "Diamond Bank", 	"code" => 234007],
 	3	=> ['name' => "Access Bank", 	"code" => 234003],
 	4	=> ['name' => "GTBank Plc", 	"code" => 234004],
 	5	=> ['name' => "Ecobank Plc", 	"code" => 234005],
 	6	=> ['name' => "FCMB", 			"code" => 234006],
-	7	=> ['name' => "Diamond Bank", 	"code" => 234007],
-	8	=> ['name' => "Providus Bank",	"code" => 234008],
+	// 8	=> ['name' => "Providus Bank",	"code" => 234008],
 ];
 
 $staging_client = new Client([
@@ -167,10 +167,10 @@ function validate(Array &$input, Array $details)
 		}
 
 		if (!empty($details['accounts'])) {
-			$reply 	.= "Select one of the following saved bank accounts or ";
+			$reply 	.= "Select one or ";
 		}
 
-		$reply 	 .= "enter your account number.";
+		$reply 	 .= "enter your acc/no.";
 
 		if (!empty($details['accounts'])) {
 
