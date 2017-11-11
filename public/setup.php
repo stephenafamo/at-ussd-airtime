@@ -139,7 +139,7 @@ function validate(Array &$input, Array $details)
 		$input[]		= $otp;
 	}
 
-	if (isset($input[0]) && (int) $input[0] > 100 && (int) $input[0] < 10000) {
+	if (isset($input[0]) && (int) $input[0] >= 100 && (int) $input[0] < 10000) {
 		$amount 	= (int) $input[0];
 	} 
 
