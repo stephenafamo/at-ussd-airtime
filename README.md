@@ -1,2 +1,2 @@
-# ussd-guessing-game
+# ussd-airtime
 
