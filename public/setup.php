@@ -18,19 +18,19 @@ $banks = [
 	// 8	=> ['name' => "Providus Bank",	"code" => 234008],
 ];
 
-$staging_client = new Client([
-	'base_uri' => $_ENV['STAGING_API_URL'],
+$payment_client = new Client([
+	'base_uri' => $_ENV['PAYMENT_API_URL'],
 	'headers' => [
-		'apikey' => $_ENV['STAGING_API_KEY'],
+		'apikey' => $_ENV['PAYMENT_API_KEY'],
 		'Content-Type' => 'application/json',
 		'Accept' => 'application/json'
 	]
 ]);
 
-$sandbox_client = new Client([
-	'base_uri' => $_ENV['SANDBOX_API_URL'],
+$client = new Client([
+	'base_uri' => $_ENV['API_URL'],
 	'headers' => [
-		'apikey' => $_ENV['SANDBOX_API_KEY'],
+		'apikey' => $_ENV['API_KEY'],
 		'Content-Type' => 'application/x-www-form-urlencoded',
 		'Accept' => 'application/json'
 	]
@@ -231,14 +231,14 @@ function addAccount(Array $validated_account, &$details)
 
 function charge($amount, $account_key, &$details) 
 {
-	global $staging_client, $type, $file;
+	global $payment_client, $type, $file;
 
 	if (!empty($details['ongoing'])) {
 		return ['status' => 'success'];
 	}
 
 	$data 		= [
-		"username" 		=> $_ENV['STAGING_API_USERNAME'],
+		"username" 		=> $_ENV['PAYMENT_API_USERNAME'],
 		"productName" 	=> $_ENV['PAYMENT_PRODUCT_NAME'],
 		"bankAccount"  	=> [
 			"accountName" 		=> "",
@@ -253,7 +253,7 @@ function charge($amount, $account_key, &$details)
 	];
 
 	try {		
-		$response 			= $staging_client->post("charge", ['body' => json_encode($data)]);
+		$response 			= $payment_client->post("charge", ['body' => json_encode($data)]);
 		$response_arr		= json_decode($response->getBody()->getContents(), true);
 
 		if ($response_arr['status'] === 'DuplicateRequest') {
@@ -284,7 +284,7 @@ function charge($amount, $account_key, &$details)
 
 function verifyOtp(&$details, $otp = false)
 {
-	global $staging_client;
+	global $payment_client;
 	
 	if (!$otp){
 		$otp = $_POST['text'];
@@ -295,14 +295,14 @@ function verifyOtp(&$details, $otp = false)
 	}
 
 	$data 		= [
-		"username" 		=> $_ENV["STAGING_API_USERNAME"],
+		"username" 		=> $_ENV["PAYMENT_API_USERNAME"],
 		"transactionId" => $details['ongoing']['transactionId'],
 		"otp" 			=> $otp
 	];
 
 
 	try {
-		$response 			= $staging_client->post("validate", ['body' => json_encode($data)]);
+		$response 			= $payment_client->post("validate", ['body' => json_encode($data)]);
 		$response_arr		= json_decode($response->getBody()->getContents(), true);
 
 		$ongoing 				= $details['ongoing'] ;
@@ -366,10 +366,10 @@ function pay($phoneNumber, $amount, $file)
 
 function sendAirtime($phoneNumber, $amount)
 {
-	global $sandbox_client;
+	global $client;
 
 	$data = [
-		'username' 		=> $_ENV['SANDBOX_API_USERNAME'],
+		'username' 		=> $_ENV['API_USERNAME'],
 		'recipients'	=> json_encode([[
 			'phoneNumber'	=> $phoneNumber,
 			'amount'		=> "NGN $amount"
@@ -377,7 +377,7 @@ function sendAirtime($phoneNumber, $amount)
 	];
 
 	try {
-		$response 			= $sandbox_client->post("airtime/send", ['form_params' => $data]);
+		$response 			= $client->post("airtime/send", ['form_params' => $data]);
 		$response_arr		= json_decode($response->getBody()->getContents(), true);
 
 		return "CON Your airtime purchase was successful!";
